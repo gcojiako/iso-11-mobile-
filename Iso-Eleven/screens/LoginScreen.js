@@ -1,30 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import { Alert, View, Text, TextInput, Button, StyleSheet, ScrollView } from 'react-native';
 import { initializeApp } from '@firebase/app';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from '@firebase/auth';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, initializeAuth, getReactNativePersistence } from '@firebase/auth';
+import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 import { getDatabase, ref, set } from '@firebase/database';
+import { FIREBASE_API_KEY, FIREBASE_AUTH_DOMAIN, FIREBASE_DATABASE_URL, FIREBASE_PROJECT_ID, FIREBASE_STORAGE_BUCKET, FIREBASE_MESSAGING_SENDER_ID, FIREBASE_APP_ID, FIREBASE_MEASUREMENT_ID} from "@env"
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAOZ_th0j76fWuIK0xPQomw_bUEbc4oTU8",
-  authDomain: "iso-11.firebaseapp.com",
-  databaseURL: "https://iso-11-default-rtdb.firebaseio.com",
-  projectId: "iso-11",
-  storageBucket: "iso-11.appspot.com",
-  messagingSenderId: "1058607854478",
-  appId: "1:1058607854478:web:96a856c473334b4d91aadf",
-  measurementId: "G-7GJZPCVYLQ"
+  apiKey: FIREBASE_API_KEY,
+  authDomain: FIREBASE_AUTH_DOMAIN,
+  databaseURL: FIREBASE_DATABASE_URL,
+  projectId: FIREBASE_PROJECT_ID,
+  storageBucket: FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: FIREBASE_MESSAGING_SENDER_ID,
+  appId: FIREBASE_APP_ID,
+  measurementId: FIREBASE_MEASUREMENT_ID
 };
 
-initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
+const auth =  initializeAuth(app, {
+  persistence: getReactNativePersistence(ReactNativeAsyncStorage)
+})
 
-const LoginScreen = () => {
+const LoginScreen = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleSignUp = async () => {
     try {
-      const auth = getAuth();
-      const database = getDatabase();
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const {uid} = userCredential.user;
 
@@ -33,6 +36,7 @@ const LoginScreen = () => {
         password: password,
         score: 500,
         signUpDate: new Date().toISOString(),
+        onboardingComplete: false,
       }
 
       await set(ref(getDatabase(), `users/${uid}`), userData);
@@ -54,10 +58,11 @@ const LoginScreen = () => {
 
   const handleSignIn = async () => {
     try {
-      const auth = getAuth();
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
+      const {onboardingComplete} = userCredential.user;
+
       Alert.alert('Sign In Successful');
+      {onboardingComplete ? navigation.navigate('home'): navigation.navigate('onboarding')}
     } catch (error) {
       console.log('Sign In Error', error.message);
       

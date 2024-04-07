@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 
-const Onboarding = () => {
+const OnboardingScreen = () => {
   return (
     <View>
       <Text>Onboarding</Text>
@@ -9,6 +9,6 @@ const Onboarding = () => {
   )
 }
 
-export default Onboarding
+export default OnboardingScreen
 
 const styles = StyleSheet.create({})
