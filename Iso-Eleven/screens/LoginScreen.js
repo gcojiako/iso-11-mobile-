@@ -3,9 +3,10 @@ import { Alert, View, Text, TextInput, Button, StyleSheet, ScrollView } from 're
 import { initializeApp } from '@firebase/app';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, initializeAuth, getReactNativePersistence } from '@firebase/auth';
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
-import { getDatabase, ref, set } from '@firebase/database';
+import { getDatabase, ref, set, get } from '@firebase/database';
 import { FIREBASE_API_KEY, FIREBASE_AUTH_DOMAIN, FIREBASE_DATABASE_URL, FIREBASE_PROJECT_ID, FIREBASE_STORAGE_BUCKET, FIREBASE_MESSAGING_SENDER_ID, FIREBASE_APP_ID, FIREBASE_MEASUREMENT_ID} from "@env"
-
+import * as Location from 'expo-location';
+ 
 const firebaseConfig = {
   apiKey: FIREBASE_API_KEY,
   authDomain: FIREBASE_AUTH_DOMAIN,
@@ -25,6 +26,7 @@ const auth =  initializeAuth(app, {
 const LoginScreen = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [location, setLocation] = useState(null);
 
   const handleSignUp = async () => {
     try {
@@ -37,9 +39,12 @@ const LoginScreen = ({navigation}) => {
         score: 500,
         signUpDate: new Date().toISOString(),
         onboardingComplete: false,
+        location,
+        username:'',
       }
 
       await set(ref(getDatabase(), `users/${uid}`), userData);
+
       Alert.alert('Sign Up Successful');
     } catch (error) {
       console.log('Sign Up Error', error.message);
@@ -59,10 +64,30 @@ const LoginScreen = ({navigation}) => {
   const handleSignIn = async () => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const {onboardingComplete} = userCredential.user;
+      const { uid} = userCredential.user;
 
-      Alert.alert('Sign In Successful');
-      {onboardingComplete ? navigation.navigate('home'): navigation.navigate('onboarding')}
+
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setErrorMsg('Permission to access location was denied');
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation(location); 
+
+      const userLocation = {
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+      };
+      
+      
+      await set(ref(getDatabase(), `users/${uid}/location`), userLocation);
+      const userSnapshot = await get(ref(getDatabase(), `users/${uid}`))
+      const userData = userSnapshot.val()
+      const {username, onboardingComplete} = userData
+
+      {onboardingComplete ? (Alert.alert(`Welcome back ${username}!`),navigation.navigate('home', { uid: uid, data: userData })): (navigation.navigate('onboarding', { uid: uid }))}
     } catch (error) {
       console.log('Sign In Error', error.message);
       
@@ -75,7 +100,7 @@ const LoginScreen = ({navigation}) => {
       } else if (error.code === "auth/wrong-password") {
         Alert.alert("Invalid password");
       } else {
-        Alert.alert('Sign In Unsuccessful, make sure you have entered the correct email and password');
+        Alert.alert('Sign In Unsuccessful');
       }
       throw error;
     }

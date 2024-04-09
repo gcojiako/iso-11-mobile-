@@ -9,15 +9,16 @@
     "web": "expo start --web"
   },
   "dependencies": {
-    "@react-native-async-storage/async-storage": "^1.23.1",
+    "@react-native-async-storage/async-storage": "^1.21.0",
     "@react-navigation/native": "^6.1.17",
     "@react-navigation/native-stack": "^6.9.26",
-    "expo": "~50.0.14",
+    "expo": "~50.0.15",
     "expo-status-bar": "~1.11.1",
     "firebase": "^10.10.0",
     "react": "18.2.0",
     "react-native": "0.73.6",
-    "react-native-dotenv": "^3.4.11"
+    "react-native-dotenv": "^3.4.11",
+    "expo-location": "~16.5.5"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

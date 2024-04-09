@@ -13,8 +13,8 @@ const StackNavigator = () => {
     <Stack.Navigator>
         <Stack.Screen name="login" component={LoginScreen} />
         <Stack.Screen name="onboarding" component={OnboardingScreen} />
-        <Stack.Screen name="home" component={HomeScreen} />
-        <Stack.Screen name="ranking" component={RankingScreen} />
+        <Stack.Screen name="home" component={HomeScreen} options={{headerLeft: null}} />
+        <Stack.Screen name="rankings" component={RankingScreen} />
         <Stack.Screen name="chat" component={ChatScreen} />
         <Stack.Screen name="requests" component={MatchRequestsScreen} />
     </Stack.Navigator>
