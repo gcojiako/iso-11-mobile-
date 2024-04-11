@@ -7,6 +7,7 @@ const OnboardingScreen = ({navigation, route}) => {
   const [username, setUsername] = useState('');
   const {uid, data} = route.params
 
+
   const checkUsername = async (username) => {
     const dbRef = ref(getDatabase(), 'users');
     try {
@@ -33,7 +34,8 @@ const OnboardingScreen = ({navigation, route}) => {
        set(ref(getDatabase(), `users/${uid}/onboardingComplete`), true)
       ]);
     Alert.alert('Cool name! Welcome to ISO 11');
-    navigation.navigate('home', {uid, data})
+
+    navigation.navigate('home', {uid: uid, data: data})
     }}catch(error){
       console.log(error);
     }
@@ -53,7 +55,7 @@ const OnboardingScreen = ({navigation, route}) => {
       <Button
         title="Continue"
         onPress={() => handleContinue(username)}
-        disabled={!username.trim()} // Disable button if username is empty
+        disabled={!username.trim()} 
       />
     </View>
   );

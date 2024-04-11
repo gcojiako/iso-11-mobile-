@@ -87,7 +87,12 @@ const LoginScreen = ({navigation}) => {
       const userData = userSnapshot.val()
       const {username, onboardingComplete} = userData
 
-      {onboardingComplete ? (Alert.alert(`Welcome back ${username}!`),navigation.navigate('home', { uid: uid, data: userData })): (navigation.navigate('onboarding', { uid: uid }))}
+      if(userData){
+        // console.log(userData)
+        {onboardingComplete ? (Alert.alert(`Welcome back ${username}!`),navigation.navigate('home', { uid: uid, data: userData })): (navigation.navigate('onboarding', { uid: uid, data: userData }))}
+
+      }
+
     } catch (error) {
       console.log('Sign In Error', error.message);
       

@@ -4,13 +4,13 @@ import { View, Text, StyleSheet } from 'react-native';
 const HomeScreen = ({ navigation, route }) => {
   const { uid, data } = route.params;
   const { username, score } = data;
+  
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Welcome, {username}</Text>
       <Text style={styles.subtitle}>Your Score: {score}</Text>
       
-      {/* Links to other screens */}
       <Text style={styles.link} onPress={() => navigation.navigate('requests', {uid, data})}>Go to Match Requests</Text>
       <Text style={styles.link} onPress={() => navigation.navigate('rankings', {uid, data})}>Go to Rankings</Text>
       <Text style={styles.link} onPress={() => navigation.navigate('chat', {uid, data})}>Go to Chat</Text>
@@ -42,3 +42,5 @@ const styles = StyleSheet.create({
 });
 
 export default HomeScreen;
+
+//include world rankings attribute
