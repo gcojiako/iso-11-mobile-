@@ -36,30 +36,29 @@ const ConversationsScreen = ({navigation, route}) => {
       const sentMessagesArray = [];
       sentMessagesSnapshot.forEach((messageSnapshot) => {
         const message = messageSnapshot.val();
-        const {fromId, toId} = message;
-        sentMessagesArray.push({ ...message, fromId, toId });
+        sentMessagesArray.push(message);
       });
   
       const receivedMessagesArray = [];
       receivedMessagesSnapshot.forEach((messageSnapshot) => {
         const message = messageSnapshot.val();
-        // console.log("message: " + message.toId)
-        const {fromId, toId} = message;
-        receivedMessagesArray.push({ ...message, fromId, toId });
+        receivedMessagesArray.push(message);
       });
 
       const allMessagesSnapshot = [...sentMessagesArray, ...receivedMessagesArray]
-      // console.log(allMessagesSnapshot, 'received')
-      const uniqueChats = Array.from(new Set(allMessagesSnapshot.map(message => {
-        if(message.fromId === uid){
-          return { id: message.toId, username: message.to };
-        } else {
-          return { id: message.fromId, username: message.from };
-        }
-        }
-      ))) 
-      // console.log(uniqueChats)
-      setAllChats(uniqueChats)
+
+      const uniqueUsers = {}
+      allMessagesSnapshot.forEach((message) => {
+        const otherUsername = message.fromId === uid ? message.to : message.from;
+        const otherUserId = message.fromId === uid ? message.toId : message.fromId;
+        uniqueUsers[otherUserId] = {id: otherUserId, username: otherUsername}
+      });
+      // console.log(uniqueUsers)
+      
+
+      const uniqueUsersArray = Object.values(uniqueUsers)
+
+      setAllChats(uniqueUsersArray)
       // console.log(allChats)
 
   }catch(error){
@@ -69,8 +68,8 @@ const ConversationsScreen = ({navigation, route}) => {
   return (
     <View>
       {allChats.map((chat, index) => (
-        <Text key={index}>
-          {chat.id}
+        <Text key={index} onPress={() => navigation.navigate('chat', {uid, selectedPlayerUid: chat.id, selectedPlayerUsername: chat.username, data})}>
+          {chat.username}
         </Text>
       ))}
     </View>

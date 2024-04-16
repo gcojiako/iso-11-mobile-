@@ -121,9 +121,9 @@ const RankingScreen = ({ navigation, route }) => {
   return (
     <View>
       {rankings.map((player, index) => (
-        <Text key={index}>
-          {player.username}: {rankedByScore ? player.score : player.distance}
-          <Button title={`chat with ${player.username}`} onPress={() => navigation.navigate('chat', {uid, selectedPlayerUid: player.uid, selectedPlayerUsername: player.username, data})}/>
+        <Text key={index} onPress={() => navigation.navigate('chat', {uid, selectedPlayerUid: player.uid, selectedPlayerUsername: player.username, data})}>
+        {player.username}: {rankedByScore ? player.score : player.distance}
+          
         </Text>
       ))}
       <Button
