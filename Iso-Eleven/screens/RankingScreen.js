@@ -130,13 +130,13 @@ const RankingScreen = ({ navigation, route }) => {
               uid,
               selectedPlayerUid: player.uid,
               selectedPlayerUsername: player.username,
-              data,
+              username,
             })
           }
         >
           {player.username}: {rankedByScore ? player.score : player.distance}
           
-          <Button title="request match" onPress={()=>navigation.navigate('requests', {username, selectedPlayerUsername: player.username, uid, selectedPlayerUid: player.uid})}/>
+          <Button title="request match" onPress={()=>navigation.navigate('requests-send', {username, selectedPlayerUsername: player.username, uid, selectedPlayerUid: player.uid})}/>
           
         </Text>
       ))}

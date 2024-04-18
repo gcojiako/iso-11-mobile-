@@ -6,8 +6,9 @@ import HomeScreen from './screens/HomeScreen'
 import RankingScreen from './screens/RankingScreen'
 import ChatScreen from './screens/ChatScreen'
 import MatchRequestsScreen from './screens/MatchRequestsScreen'
-import RequestScreen from './screens/RequestScreen'
+import RequestSendScreen from './screens/RequestSendScreen'
 import ConversationsScreen from './screens/ConversationsScreen'
+import RequestViewScreen from './screens/RequestViewScreen'
 
 const Stack = createNativeStackNavigator()
 const StackNavigator = () => {
@@ -20,7 +21,8 @@ const StackNavigator = () => {
         <Stack.Screen name="conversations" component={ConversationsScreen} />
         <Stack.Screen name="chat" component={ChatScreen} />
         <Stack.Screen name="match-requests" component={MatchRequestsScreen} />
-        <Stack.Screen name="requests" component={RequestScreen} />
+        <Stack.Screen name="requests-send" component={RequestSendScreen} />
+        <Stack.Screen name="requests-view" component={RequestViewScreen} />
     </Stack.Navigator>
   )
 }

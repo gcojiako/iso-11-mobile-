@@ -12,8 +12,7 @@ import {
 } from "@firebase/database";
 
 const ChatScreen = ({ navigation, route }) => {
-  const { uid, selectedPlayerUid, selectedPlayerUsername, data } = route.params;
-  const { username } = data;
+  const { uid, selectedPlayerUid, selectedPlayerUsername, username } = route.params;
   const [textArea, setTextArea] = useState("");
   const [messages, setMessages] = useState([]);
 

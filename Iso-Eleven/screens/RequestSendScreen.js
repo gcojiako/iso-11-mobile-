@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Modal, Button, TextInput } from "react-native";
+import { Alert, View, Text, Modal, Button, TextInput } from "react-native";
 import {
   query,
   orderByChild,
@@ -45,11 +45,9 @@ const OpenRequestModal = ({
       status: "pending",
     };
     
-    // Perform actions with the request object (e.g., send to database)
-    console.log("Request:", request);
-  
-    await push(ref(getDatabase(), `requests/${uid}`), request);
-    await push(ref(getDatabase(), `requests/${selectedPlayerUid}`), request);
+    
+    await set(ref(getDatabase(), `requests/${uid}/${selectedPlayerUid}`), request);
+    await set(ref(getDatabase(), `requests/${selectedPlayerUid}/${uid}`), request);
   
     // Close the modal
     navigation.goBack();
@@ -90,7 +88,7 @@ const OpenRequestModal = ({
               placeholder="Enter additional rules"
             />
             
-            <Button title="Submit" onPress={() => sendRequest({ username, selectedPlayerUsername, uid, selectedPlayerUid, time, location, endScore, additionalRules })} />
+            <Button title="Submit" onPress={() => {time && location && endScore ? sendRequest({ username, selectedPlayerUsername, uid, selectedPlayerUid, time, location, endScore, additionalRules }): Alert.alert("Please fill out all fields, additional rules are not needed")}} />
             <Button
         title="Close Modal"
         onPress={() => navigation.goBack()}

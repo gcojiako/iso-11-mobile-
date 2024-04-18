@@ -1,5 +1,5 @@
-import { StyleSheet, Text, View, } from 'react-native'
-import React, { useState, useEffect }from 'react'
+import { StyleSheet, Text, View, Button } from "react-native";
+import React, { useState, useEffect } from "react";
 import {
   query,
   orderByChild,
@@ -17,8 +17,8 @@ import {
 // should be able to chat through requests screen
 // closing a request should remove it from the list of requests and update the score of both users
 const MatchRequestsScreen = ({ navigation, route }) => {
-  const { uid, data } = route.params;
-  const { username } = data;
+  const { uid, username } = route.params;
+  // console.log(username, uid)
 
   const [textArea, setTextArea] = useState("");
   const [allRequests, setAllRequests] = useState([]);
@@ -47,59 +47,66 @@ const MatchRequestsScreen = ({ navigation, route }) => {
   // }
   // const declineRequest = async () => {}
   // const closeRequest = async () => {}
-  const collectRequests = async () =>  {
+  const collectRequests = async () => {
     try {
-      const dbRef = ref(getDatabase(), `requests/${uid}`)
+      const dbRef = ref(getDatabase(), `requests/${uid}`);
+      const userRequestSnapshots = await get(dbRef);
 
-      const sentRequestsSnapshot = await get(
-        query(dbRef, orderByChild('from'), equalTo(username))
-      );
-      const receivedRequestsSnapshot = await get(
-        query(dbRef, orderByChild('to'), equalTo(username))
-      );
+      userRequestsDictionary = {};
 
-      const sentRequestsArray = [];
-      sentRequestsSnapshot.forEach((requestSnapshot) => {
+      userRequestSnapshots.forEach((requestSnapshot) => {
         const request = requestSnapshot.val();
-        sentRequestsArray.push(request);
+        const RequestUsername = request.to;
+        const RequestUserId = request.toId;
+
+        userRequestsDictionary[RequestUserId] = {
+          id: RequestUserId,
+          username: RequestUsername,
+        };
       });
-  
-      const receivedRequestsArray = [];
-      receivedRequestsSnapshot.forEach((requestSnapshot) => {
-        const request = requestSnapshot.val();
-        receivedRequestsArray.push(request);
-      });
 
-      const allRequestsSnapshot = [...sentRequestsArray, ...receivedRequestsArray]
-
-      const uniqueRequests = {}
-      allRequestsSnapshot.forEach((request) => {
-        const RequestUsername = request.fromId === uid ? request.to : request.from;
-        const RequestUserId = request.fromId === uid ? request.toId : request.fromId;
-        uniqueRequests[otherUserId] = {id: RequestUserId, username: RequestUsername}
-      });
-      
-
-      const uniqueRequestsArray = Object.values(uniqueRequests)
-
-      setAllRequests(uniqueRequestsArray)
-      // console.log(allChats)
-
-  }catch(error){
-    console.error('messages error:', error);
-    throw error;
-  }}
-
+      const uniqueRequestsArray = Object.values(userRequestsDictionary);
+      setAllRequests(uniqueRequestsArray);
+      // console.log(uniqueRequestsArray)
+      // console.log(uniqueRequestsArray)
+      // console.log(allRequests)
+    } catch (error) {
+      console.error("messages error:", error);
+      throw error;
+    }
+  };
+  //clicking on a request should open a modal with the request details: chat & accept/decline/close
+  // view request -> option to close -> who won? -> update request status
   return (
     <View>
       {allRequests.map((request, index) => (
-        <Text key={index}>
+        <Text
+          key={index}
+          onPress={() =>
+            navigation.navigate("chat", {
+              uid,
+              selectedPlayerUid: request.id,
+              selectedPlayerUsername: request.username,
+              username,
+            })
+          }
+        >
           {request.username}
+          <Button
+            title="view request"
+            onPress={() =>
+              navigation.navigate("requests-view", {
+                username,
+                selectedPlayerUsername: request.username,
+                uid,
+                selectedPlayerUid: request.id,
+              })
+            }
+          />
         </Text>
       ))}
     </View>
-  )
-}
+  );
+};
 
-export default MatchRequestsScreen
-
+export default MatchRequestsScreen;
