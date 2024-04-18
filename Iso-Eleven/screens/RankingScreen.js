@@ -12,9 +12,11 @@ import * as Location from "expo-location";
 
 const RankingScreen = ({ navigation, route }) => {
   const { uid, data } = route.params;
+  const { username } = data;
   const [rankings, setRankings] = useState([]);
   const [rankedByScore, setRankedByScore] = useState(false);
   const [location, setLocation] = useState(null);
+
 
   useEffect(() => {
     if (rankedByScore) {
@@ -121,8 +123,20 @@ const RankingScreen = ({ navigation, route }) => {
   return (
     <View>
       {rankings.map((player, index) => (
-        <Text key={index} onPress={() => navigation.navigate('chat', {uid, selectedPlayerUid: player.uid, selectedPlayerUsername: player.username, data})}>
-        {player.username}: {rankedByScore ? player.score : player.distance}
+        <Text
+          key={index}
+          onPress={() =>
+            navigation.navigate("chat", {
+              uid,
+              selectedPlayerUid: player.uid,
+              selectedPlayerUsername: player.username,
+              data,
+            })
+          }
+        >
+          {player.username}: {rankedByScore ? player.score : player.distance}
+          
+          <Button title="request match" onPress={()=>navigation.navigate('requests', {username, selectedPlayerUsername: player.username, uid, selectedPlayerUid: player.uid})}/>
           
         </Text>
       ))}

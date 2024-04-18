@@ -11,7 +11,7 @@ const HomeScreen = ({ navigation, route }) => {
       <Text style={styles.title}>Welcome, {username}</Text>
       <Text style={styles.subtitle}>Your Score: {score}</Text>
       
-      <Text style={styles.link} onPress={() => navigation.navigate('requests', {uid, data})}>Go to Match Requests</Text>
+      <Text style={styles.link} onPress={() => navigation.navigate('match-requests', {uid, data})}>Go to Match Requests</Text>
       <Text style={styles.link} onPress={() => navigation.navigate('rankings', {uid, data})}>Go to Rankings</Text>
       <Text style={styles.link} onPress={() => navigation.navigate('conversations', {uid, data})}>View Conversations</Text>
     </View>
