@@ -36,7 +36,7 @@ const LoginScreen = ({navigation}) => {
       const userData = {
         email: email,
         password: password,
-        score: 500,
+        score: 1200,
         signUpDate: new Date().toISOString(),
         onboardingComplete: false,
         location,

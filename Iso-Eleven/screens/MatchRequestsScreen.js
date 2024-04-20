@@ -56,7 +56,7 @@ const MatchRequestsScreen = ({ navigation, route }) => {
 
       userRequestSnapshots.forEach((requestSnapshot) => {
         const request = requestSnapshot.val();
-        const RequestUsername = request.to;
+        const RequestUsername = request.to === username ? request.from : request.to;
         const RequestUserId = request.toId === uid ? request.fromId : request.toId;
   
 

@@ -43,6 +43,7 @@ const OpenRequestModal = ({
       endScore: endScore,
       additionalRules: additionalRules,
       status: "pending",
+      waitingOn: [username, selectedPlayerUsername]
     };
     
     
