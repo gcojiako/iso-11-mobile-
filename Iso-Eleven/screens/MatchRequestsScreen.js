@@ -26,27 +26,6 @@ const MatchRequestsScreen = ({ navigation, route }) => {
   useEffect(() => {
     collectRequests();
   }, [allRequests]);
-  // const request = {
-  //   timestamp: new Date().toISOString(),
-  //   from: username,
-  //   to: selectedPlayerUsername,
-  //   fromId: uid,
-  //   toId: selectedPlayerUid,
-  //   specialRules: textArea,
-  //   status: "pending",
-  // };
-
-  // const sendRequest = async () => {
-  //   await push(ref(getDatabase(), `requests/${uid}`), request);
-  //   await push(ref(getDatabase(), `requests/${selectedPlayerUid}`), request);
-  //   setTextArea("")
-  // }
-
-  // const acceptRequest = async () => {
-
-  // }
-  // const declineRequest = async () => {}
-  // const closeRequest = async () => {}
   const collectRequests = async () => {
     try {
       const dbRef = ref(getDatabase(), `requests/${uid}`);

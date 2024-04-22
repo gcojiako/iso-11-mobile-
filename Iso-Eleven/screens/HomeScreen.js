@@ -1,13 +1,23 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Button } from 'react-native';
+import { getAuth, signOut } from "firebase/auth";
+
 
 const HomeScreen = ({ navigation, route }) => {
   const { uid, data } = route.params;
   const { username, score } = data;
+  const auth = getAuth();
+
+  const handleSignOut = () => {
+    signOut(auth).then(() => navigation.navigate("login"));
+  }
   
 
   return (
     <View style={styles.container}>
+      <View style={styles.signOutButtonContainer}>
+        <Button title="Sign Out" onPress={handleSignOut} />
+      </View>
       <Text style={styles.title}>Welcome, {username}</Text>
       <Text style={styles.subtitle}>Your Score: {score}</Text>
       
@@ -38,6 +48,11 @@ const styles = StyleSheet.create({
     color: 'blue',
     textDecorationLine: 'underline',
     marginBottom: 10,
+  },
+  signOutButtonContainer: {
+    position: 'absolute',
+    top: 20,
+    right: 20,
   },
 });
 

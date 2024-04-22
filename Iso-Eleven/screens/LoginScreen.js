@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Alert, View, Text, TextInput, Button, StyleSheet, ScrollView } from 'react-native';
 import { initializeApp } from '@firebase/app';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, initializeAuth, getReactNativePersistence } from '@firebase/auth';
+import { onAuthStateChanged, getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, initializeAuth, getReactNativePersistence, sendEmailVerification } from '@firebase/auth';
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 import { getDatabase, ref, set, get } from '@firebase/database';
 import { FIREBASE_API_KEY, FIREBASE_AUTH_DOMAIN, FIREBASE_DATABASE_URL, FIREBASE_PROJECT_ID, FIREBASE_STORAGE_BUCKET, FIREBASE_MESSAGING_SENDER_ID, FIREBASE_APP_ID, FIREBASE_MEASUREMENT_ID} from "@env"
@@ -24,13 +24,33 @@ const auth =  initializeAuth(app, {
 })
 
 const LoginScreen = ({navigation}) => {
+  console.log(auth)
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [location, setLocation] = useState(null);
 
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const userSnapshot = await get(ref(getDatabase(), `users/${user.uid}`));
+        const userData = userSnapshot.val();
+
+        if (userData && userData.onboardingComplete) {
+          navigation.navigate('home', { uid: user.uid, data: userData });
+        }
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   const handleSignUp = async () => {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+
+      sendEmailVerification(userCredential.user)
+      Alert.alert('Email verification sent, please verify')
       const {uid} = userCredential.user;
 
       const userData = {
@@ -45,7 +65,6 @@ const LoginScreen = ({navigation}) => {
 
       await set(ref(getDatabase(), `users/${uid}`), userData);
 
-      Alert.alert('Sign Up Successful');
     } catch (error) {
       console.log('Sign Up Error', error.message);
 
@@ -64,7 +83,13 @@ const LoginScreen = ({navigation}) => {
   const handleSignIn = async () => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const { uid} = userCredential.user;
+
+      const user = userCredential.user;
+      if (!user.emailVerified) {
+        Alert.alert("Email not verified. Please verify your email before signing in.");
+        return;
+      }
+      const { uid} = user;
 
 
       let { status } = await Location.requestForegroundPermissionsAsync();

@@ -45,6 +45,7 @@ const RequestViewScreen = ({navigation, route}) => {
     }
 
     const calculateScores = (winner, loser, K=32) =>{
+      // console.log("calculate scores is running")
       // Calculate expected scores
     const winnerElo = 1 / (1 + Math.pow(10, (loser - winner) / 400));
     const loserElo = 1 / (1 + Math.pow(10, (winner - loser) / 400));
@@ -53,13 +54,14 @@ const RequestViewScreen = ({navigation, route}) => {
     const Sa = 1;
 
     // Calculate the updated ratings
-    const newWinnerElo = winner + K * (Sa - winnerElo);
-    const newLoserElo = loser + K * ((1 - Sa) - loserElo);
-
-    return { newWinnerScore: newWinnerElo.toFixed(2), newLoserScore: newLoserElo.toFixed(2) };
+    const newWinnerElo = (winner + K * (Sa - winnerElo)).toFixed(2);
+    const newLoserElo = (loser + K * ((1 - Sa) - loserElo)).toFixed(2);
+      // console.log("new scores returned from calculate score: ", newWinnerElo, newLoserElo )
+    return { newWinnerScore: newWinnerElo, newLoserScore: newLoserElo};
     }
 
     const updateScores = async (winner) =>{
+      console.log("update scores is running")
 
       // update the scores according to the winner using elo
       const dbRef = ref(getDatabase(), `users/${uid}`)
@@ -70,15 +72,20 @@ const RequestViewScreen = ({navigation, route}) => {
 
       const userDetails = userSnapshot.val()
       const playerDetails = playerSnapshot.val()
+      console.log(userDetails)
+      console.log(playerDetails)
 
       if (userDetails.username === winner){
+        // console.log(winner, "is the winner")
         const { newWinnerScore, newLoserScore } = calculateScores(playerDetails.score, userDetails.score, 32)
+        // console.log("winning score, and losing score: ", newWinnerScore, newLoserScore)
         set(ref(getDatabase(), `users/${uid}/score`), newWinnerScore)
         set(ref(getDatabase(), `users/${selectedPlayerUid}/score`), newLoserScore)
 
       }else{
-        console.log(playerDetails.username, winner)
+        // console.log(playerDetails.username, "is the winner")
         const { newWinnerScore, newLoserScore } = calculateScores(playerDetails.score, userDetails.score, 32)
+        // console.log("winning score, and losing score: ", newWinnerScore, newLoserScore)
         set(ref(getDatabase(), `users/${uid}/score`), newLoserScore)
         set(ref(getDatabase(), `users/${selectedPlayerUid}/score`), newWinnerScore)
 
