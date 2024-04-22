@@ -101,8 +101,8 @@ const RequestViewScreen = ({navigation, route}) => {
           set(dbRef,`${winner}...`)
           set(dbRefPlayer,`${winner}...`)
 
-          set(ref(getDatabase(), `requests/${uid}/${selectedPlayerUid}/waitingOn`, [selectedPlayerUsername]))
-          set(ref(getDatabase(), `requests/${uid}/${selectedPlayerUid}/waitingOn`, [selectedPlayerUsername]))
+          set(ref(getDatabase(), `requests/${uid}/${selectedPlayerUid}/waitingOn`), [selectedPlayerUsername])
+          set(ref(getDatabase(), `requests/${uid}/${selectedPlayerUid}/waitingOn`), [selectedPlayerUsername])
           setWaitingOnPlayers([selectedPlayerUsername])
 
           toggleModal()
@@ -112,8 +112,8 @@ const RequestViewScreen = ({navigation, route}) => {
           set(dbRef,`${winner}...`)
           set(dbRefPlayer,`${winner}...`)
 
-          set(ref(getDatabase(), `requests/${selectedPlayerUid}/${uid}/waitingOn`, [selectedPlayerUsername]))
-          set(ref(getDatabase(), `requests/${uid}/${selectedPlayerUid}/waitingOn`, [selectedPlayerUsername]))
+          set(ref(getDatabase(), `requests/${selectedPlayerUid}/${uid}/waitingOn`), [selectedPlayerUsername])
+          set(ref(getDatabase(), `requests/${uid}/${selectedPlayerUid}/waitingOn`), [selectedPlayerUsername])
           setWaitingOnPlayers([selectedPlayerUsername])
           
           toggleModal()
