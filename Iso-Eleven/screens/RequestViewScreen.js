@@ -137,34 +137,34 @@ const RequestViewScreen = ({navigation, route}) => {
         // if status is pending, update winner. if winner does not agree, update to undecided. if status is undecided then repeat until winners agree
         
     }
-  return (
-    <View>
-      <Text>
-        Sender: {requestDetails.from}{"\n"}
-        Time: {requestDetails.time}{"\n"}
-        Location: {requestDetails.location}{"\n"}
-        Game to: {requestDetails.endScore}{"\n"}
-        Winner: {requestDetails.status}{"\n"}
-      </Text>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <Text style={styles.modalText}>Please select the winner</Text>
-            <Text style={styles.modalText} onPress={()=>closeRequest(username)}>{username}</Text>
-            <Text style={styles.modalText} onPress={()=>closeRequest(selectedPlayerUsername)}>{selectedPlayerUsername}</Text>
-            <Button title='close modal' onPress={toggleModal}/>
-
+    return (
+      <View style={styles.container}>
+        <Text style={styles.selectedPlayerText}>{selectedPlayerUsername}</Text>
+        <Text>
+          Sender: {requestDetails.from}{"\n"}
+          Time: {requestDetails.time}{"\n"}
+          Location: {requestDetails.location}{"\n"}
+          Game to: {requestDetails.endScore}{"\n"}
+          Winner: {requestDetails.status}{"\n"}
+        </Text>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <Text style={styles.modalText}>Please select the winner</Text>
+              <Text style={styles.modalText} onPress={()=>closeRequest(username)}>{username}</Text>
+              <Text style={styles.modalText} onPress={()=>closeRequest(selectedPlayerUsername)}>{selectedPlayerUsername}</Text>
+              <Button title='close modal' onPress={toggleModal}/>
+            </View>
           </View>
-        </View>
-      </Modal>
-      <Button title="close request?" onPress={()=>waitingOnPlayers.includes(username) ? toggleModal(): Alert.alert("must wait for other player")} />
-    </View>
-  )
+        </Modal>
+        <Button title="close request?" onPress={()=>waitingOnPlayers.includes(username) ? toggleModal(): Alert.alert("must wait for other player")} />
+      </View>
+    )
 }
 
 export default RequestViewScreen
@@ -174,6 +174,11 @@ const styles = StyleSheet.create({
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
+    },
+    selectedPlayerText: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      marginBottom: 20,
     },
     centeredView: {
       flex: 1,
@@ -192,4 +197,4 @@ const styles = StyleSheet.create({
       marginBottom: 15,
       textAlign: 'center',
     },
-  });
+});

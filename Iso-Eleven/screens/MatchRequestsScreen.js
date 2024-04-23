@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Button } from "react-native";
+import { StyleSheet, Text, View, Button, TouchableOpacity } from "react-native";
 import React, { useState, useEffect } from "react";
 import {
   query,
@@ -58,35 +58,73 @@ const MatchRequestsScreen = ({ navigation, route }) => {
   //clicking on a request should open a modal with the request details: chat & accept/decline/close
   // view request -> option to close -> who won? -> update request status
   return (
-    <View>
-      {allRequests.map((request, index) => (
-        <Text
-          key={index}
-          onPress={() =>
-            navigation.navigate("chat", {
-              uid,
-              selectedPlayerUid: request.id,
-              selectedPlayerUsername: request.username,
-              username,
-            })
-          }
-        >
-          {request.username}
-          <Button
-            title="view request"
+    <View style={styles.container}>
+      <Text style={styles.title}>Match Requests</Text>
+      <View style={styles.requestsContainer}>
+        {allRequests.map((request, index) => (
+          <TouchableOpacity
+            key={index}
             onPress={() =>
-              navigation.navigate("requests-view", {
-                username,
-                selectedPlayerUsername: request.username,
+              navigation.navigate("chat", {
                 uid,
                 selectedPlayerUid: request.id,
+                selectedPlayerUsername: request.username,
+                username,
               })
             }
-          />
-        </Text>
-      ))}
+            style={styles.requestItem}
+          >
+            <Text style={styles.requestUsername}>{request.username}</Text>
+            <Button
+              title="View Request"
+              onPress={() =>
+                navigation.navigate("requests-view", {
+                  username,
+                  selectedPlayerUsername: request.username,
+                  uid,
+                  selectedPlayerUid: request.id,
+                })
+              }
+            />
+          </TouchableOpacity>
+        ))}
+      </View>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: "#fff",
+    alignItems: "center", // Align items in the center horizontally
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+    textAlign: "center", // Center text horizontally
+  },
+  requestsContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "stretch",
+    width: "100%", // Make requests container take full width
+  },
+  requestItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 10,
+    marginBottom: 10,
+    backgroundColor: "#f0f0f0",
+    borderRadius: 5,
+    width: "100%", // Make request item take full width
+  },
+  requestUsername: {
+    fontSize: 18,
+  },
+});
 
 export default MatchRequestsScreen;

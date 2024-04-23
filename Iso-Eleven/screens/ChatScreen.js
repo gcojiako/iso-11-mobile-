@@ -1,4 +1,4 @@
-import { View, Text, TextInput, Button } from "react-native";
+import { View, Text, TextInput, Button, StyleSheet } from "react-native";
 import React, { useState, useEffect } from "react";
 import {
   query,
@@ -75,26 +75,47 @@ const ChatScreen = ({ navigation, route }) => {
   }; 
   ;
   return (
-    <View>
-      {/* <Text>{selectedPlayer.username}</Text> */}
+    <View style={styles.container}>
+      <Text style={styles.selectedPlayerText}>{selectedPlayerUsername}</Text>
       {messages.map((message, index) => (
-        <Text key={index}>
+        <Text key={index} style={styles.message}>
           {message.from} - {message.message}
         </Text>
       ))}
       <TextInput
-        placeholder="write a message"
+        style={styles.input}
+        placeholder="Write a message"
         onChangeText={setTextArea}
         value={textArea}
         autoCapitalize="none"
       />
-      <Button title={"send message"} onPress={sendMessage} />
+      <Button title={"Send Message"} onPress={sendMessage} />
     </View>
   );
 };
 
-export default ChatScreen;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  selectedPlayerText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: 'black',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10,
+    width: '80%',
+  },
+  message: {
+    marginBottom: 5,
+  },
+});
 
-// requests need to be accepted to be able to send messages
-// display all user messages
-// send & receive messages
+export default ChatScreen;

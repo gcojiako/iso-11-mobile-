@@ -9,6 +9,10 @@ const OnboardingScreen = ({navigation, route}) => {
 
 
   const checkUsername = async (username) => {
+    if (username.length < 5 || username.length > 30){
+      Alert.alert('Username must be within 5 and 30 characters');
+        return false;
+    }
     const dbRef = ref(getDatabase(), 'users');
     try {
       const usernameValid = await get(query(dbRef, orderByChild('username'), equalTo(username)));

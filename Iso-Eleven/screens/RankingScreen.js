@@ -1,4 +1,4 @@
-import { View, Text, Button } from "react-native";
+import { View, Text, Button, StyleSheet } from "react-native";
 import React, { useState, useEffect } from "react";
 import {
   query,
@@ -24,7 +24,7 @@ const RankingScreen = ({ navigation, route }) => {
     } else {
       getRankingsByDistance();
     }
-  }, [rankings]);
+  }, [rankedByScore]);
 
   const updateUserLocation = async () => {
     let tempLocation = await Location.getCurrentPositionAsync({});
@@ -119,33 +119,73 @@ const RankingScreen = ({ navigation, route }) => {
   const toggleRankingOrder = () => {
     setRankedByScore(!rankedByScore); // Toggle rankedByScore state
   };
-
   return (
-    <View>
+    <View style={styles.container}>
+      <Text style={styles.title}>Rankings</Text>
       {rankings.map((player, index) => (
-        <Text
-          key={index}
-          onPress={() =>
-            navigation.navigate("chat", {
-              uid,
-              selectedPlayerUid: player.uid,
-              selectedPlayerUsername: player.username,
-              username,
-            })
-          }
-        >
-          {player.username}: {rankedByScore ? player.score : player.distance}
-          
-          <Button title="request match" onPress={()=>navigation.navigate('requests-send', {username, selectedPlayerUsername: player.username, uid, selectedPlayerUid: player.uid})}/>
-          
-        </Text>
+        <View key={index} style={styles.playerContainer}>
+          <Text
+            onPress={() =>
+              navigation.navigate("chat", {
+                uid,
+                selectedPlayerUid: player.uid,
+                selectedPlayerUsername: player.username,
+                username,
+              })
+            }
+            style={styles.playerText}
+          >
+            {player.username}:{" "}
+            {rankedByScore ? player.score : player.distance}
+          </Text>
+          <Button
+            title="Request Match"
+            onPress={() =>
+              navigation.navigate("requests-send", {
+                username,
+                selectedPlayerUsername: player.username,
+                uid,
+                selectedPlayerUid: player.uid,
+              })
+            }
+          />
+        </View>
       ))}
       <Button
-        title={rankedByScore ? "Rank by distance" : "Rank by Score"}
+        title={rankedByScore ? "Rank by Distance" : "Rank by Score"}
         onPress={toggleRankingOrder}
+        style={styles.toggleButton}
       />
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+  },
+  playerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 10,
+  },
+  playerText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginRight: 10,
+  },
+  toggleButton: {
+    marginTop: 20,
+  },
+});
 
 export default RankingScreen;

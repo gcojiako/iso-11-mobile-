@@ -24,7 +24,7 @@ const auth =  initializeAuth(app, {
 })
 
 const LoginScreen = ({navigation}) => {
-  console.log(auth)
+  // console.log(auth)
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -77,7 +77,7 @@ const LoginScreen = ({navigation}) => {
     }else{
         Alert.alert('Sign Up Unsuccessful');
     }
-      throw error;
+      
   }};
 
   const handleSignIn = async () => {
@@ -132,7 +132,7 @@ const LoginScreen = ({navigation}) => {
       } else {
         Alert.alert('Sign In Unsuccessful');
       }
-      throw error;
+      
     }
   };
 

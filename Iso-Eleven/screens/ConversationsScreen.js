@@ -66,16 +66,60 @@ const ConversationsScreen = ({navigation, route}) => {
     throw error;
   }}
   return (
-    <View>
-      {allChats.map((chat, index) => (
-        <Text key={index} onPress={() => navigation.navigate('chat', {uid, selectedPlayerUid: chat.id, selectedPlayerUsername: chat.username, data})}>
-          {chat.username}
-        </Text>
-      ))}
+    <View style={styles.container}>
+      <Text style={styles.title}>Conversations</Text>
+      <View style={styles.chatsContainer}>
+        {allChats.map((chat, index) => (
+          <Text
+            key={index}
+            style={styles.chatItem}
+            onPress={() =>
+              navigation.navigate("chat", {
+                uid,
+                selectedPlayerUid: chat.id,
+                selectedPlayerUsername: chat.username,
+                data,
+              })
+            }
+          >
+            <Text style={styles.chatUsername}>{chat.username}</Text>
+          </Text>
+        ))}
+      </View>
     </View>
-  )
+  );
 }
 
-export default ConversationsScreen
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: "#fff",
+    alignItems: "center", // Align items in the center horizontally
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+    textAlign: "center", // Center text horizontally
+  },
+  chatsContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "stretch",
+    width: "100%", // Make chats container take full width
+  },
+  chatItem: {
+    padding: 10,
+    marginBottom: 10,
+    backgroundColor: "#f0f0f0",
+    borderRadius: 5,
+    width: "100%", // Make chat item take full width
+    textAlign: "center", // Center text horizontally
+  },
+  chatUsername: {
+    fontSize: 18,
+  },
+});
 
-const styles = StyleSheet.create({})
+export default ConversationsScreen
