@@ -94,6 +94,7 @@ const OpenRequestModal = ({
         title="Close Modal"
         onPress={() => navigation.goBack()}
       />
+      
           </View>
         </View>
 

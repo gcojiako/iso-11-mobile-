@@ -6,6 +6,7 @@ import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 import { getDatabase, ref, set, get } from '@firebase/database';
 import { FIREBASE_API_KEY, FIREBASE_AUTH_DOMAIN, FIREBASE_DATABASE_URL, FIREBASE_PROJECT_ID, FIREBASE_STORAGE_BUCKET, FIREBASE_MESSAGING_SENDER_ID, FIREBASE_APP_ID, FIREBASE_MEASUREMENT_ID} from "@env"
 import * as Location from 'expo-location';
+import { useUID } from '../functions/UIDContext';
  
 const firebaseConfig = {
   apiKey: FIREBASE_API_KEY,
@@ -24,7 +25,7 @@ const auth =  initializeAuth(app, {
 })
 
 const LoginScreen = ({navigation}) => {
-  // console.log(auth)
+  const { setUID } = useUID();
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -33,11 +34,13 @@ const LoginScreen = ({navigation}) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        const userSnapshot = await get(ref(getDatabase(), `users/${user.uid}`));
+        const uid = user.uid;
+        setUID(uid);
+        const userSnapshot = await get(ref(getDatabase(), `users/${uid}`));
         const userData = userSnapshot.val();
 
         if (userData && userData.onboardingComplete) {
-          navigation.navigate('home', { uid: user.uid, data: userData });
+          navigation.navigate('bottom-tabs', { screen: 'Home', params: { uid: uid } })
         }
       }
     });
@@ -52,6 +55,7 @@ const LoginScreen = ({navigation}) => {
       sendEmailVerification(userCredential.user)
       Alert.alert('Email verification sent, please verify')
       const {uid} = userCredential.user;
+      setUID(uid);
 
       const userData = {
         email: email,
@@ -68,15 +72,7 @@ const LoginScreen = ({navigation}) => {
     } catch (error) {
       console.log('Sign Up Error', error.message);
 
-      if (error.code === "auth/invalid-email") {
-        Alert.alert("Invalid email");
-      } else if (error.code === "auth/weak-password") {
-        Alert.alert("Password should be at least 6 characters long");
-      } else if (error.code === "auth/email-already-in-use") {
-        Alert.alert("Email already in use, please sign in");
-    }else{
-        Alert.alert('Sign Up Unsuccessful');
-    }
+      
       
   }};
 
@@ -90,12 +86,12 @@ const LoginScreen = ({navigation}) => {
         return;
       }
       const { uid} = user;
+      setUID(uid);
 
 
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied');
-        return;
+        console.log('Permission to access location was denied');
       }
 
       let location = await Location.getCurrentPositionAsync({});
@@ -114,24 +110,12 @@ const LoginScreen = ({navigation}) => {
 
       if(userData){
         // console.log(userData)
-        {onboardingComplete ? (Alert.alert(`Welcome back ${username}!`),navigation.navigate('home', { uid: uid, data: userData })): (navigation.navigate('onboarding', { uid: uid, data: userData }))}
+        {onboardingComplete ? (Alert.alert(`Welcome back ${username}!`),navigation.navigate('bottom-tabs', { screen: 'Home', params: { uid: uid } })): (navigation.navigate('onboarding', { uid: uid, data: userData }))}
 
       }
 
     } catch (error) {
       console.log('Sign In Error', error.message);
-      
-      if (error.code === "auth/invalid-email") {
-        Alert.alert("Invalid email");
-      } else if (error.code === "auth/user-disabled") {
-        Alert.alert("Your account has been disabled");
-      } else if (error.code === "auth/user-not-found") {
-        Alert.alert("No user found with this email");
-      } else if (error.code === "auth/wrong-password") {
-        Alert.alert("Invalid password");
-      } else {
-        Alert.alert('Sign In Unsuccessful');
-      }
       
     }
   };

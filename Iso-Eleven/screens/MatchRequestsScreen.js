@@ -11,20 +11,42 @@ import {
   equalTo,
 } from "@firebase/database";
 
-// create requests library. able to send request through rankings screen and conversation screen
-// display reuqests similar to the conversation screen, but only with accepted requests
-// functions: send request, accept request, decline request, close request, display requests (shows status: pending or accepted)
-// should be able to chat through requests screen
-// closing a request should remove it from the list of requests and update the score of both users
+import getUser from "../functions/getUser";
+import { useUID } from '../functions/UIDContext';
+
+
 const MatchRequestsScreen = ({ navigation, route }) => {
-  const { uid, username } = route.params;
+  const { uid } = useUID()
+  const [userData, setUserData] = useState(null);
+  const username = userData?.username
   // console.log(username, uid)
 
   const [textArea, setTextArea] = useState("");
   const [allRequests, setAllRequests] = useState([]);
 
   useEffect(() => {
-    collectRequests();
+    let isMounted = true;
+
+    const fetchUserDataAndCollectRequests = async () => {
+      try {
+        if (!userData) {
+          const data = await getUser({ uid });
+          if (isMounted) {
+            setUserData(data);
+          }
+        }
+        await collectRequests();
+      } catch (error) {
+        console.error("Error fetching user data and requests:", error);
+      }
+    };
+
+    fetchUserDataAndCollectRequests();
+
+    return () => {
+      isMounted = false;
+    };
+    
   }, [allRequests]);
   const collectRequests = async () => {
     try {

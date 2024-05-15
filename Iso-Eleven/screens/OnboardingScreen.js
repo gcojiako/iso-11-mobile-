@@ -39,7 +39,7 @@ const OnboardingScreen = ({navigation, route}) => {
       ]);
     Alert.alert('Cool name! Welcome to ISO 11');
 
-    navigation.navigate('home', {uid: uid, data: data})
+    navigation.navigate('bottom-tabs', { screen: 'Home', params: { uid: uid } })
     }}catch(error){
       console.log(error);
     }

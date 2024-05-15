@@ -137,6 +137,7 @@ const RequestViewScreen = ({navigation, route}) => {
         // if status is pending, update winner. if winner does not agree, update to undecided. if status is undecided then repeat until winners agree
         
     }
+
     return (
       <View style={styles.container}>
         <Text style={styles.selectedPlayerText}>{selectedPlayerUsername}</Text>
@@ -163,6 +164,7 @@ const RequestViewScreen = ({navigation, route}) => {
           </View>
         </Modal>
         <Button title="close request?" onPress={()=>waitingOnPlayers.includes(username) ? toggleModal(): Alert.alert("must wait for other player")} />
+        <Button title="back to rankings" onPress={()=> navigation.goBack()}/>
       </View>
     )
 }

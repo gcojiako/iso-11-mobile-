@@ -1,16 +1,41 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { View, Text, StyleSheet, Button } from 'react-native';
 import { getAuth, signOut } from "firebase/auth";
+import getUser from '../functions/getUser';
 
 
 const HomeScreen = ({ navigation, route }) => {
-  const { uid, data } = route.params;
-  const { username, score } = data;
+  const { uid} = route.params;
   const auth = getAuth();
+  const [userData, setUserData] = useState(null)
+
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchUserData = async () => {
+      try {
+        const data = await getUser({ uid });
+        if (isMounted) {
+          setUserData(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch user data:", error);
+      }
+    };
+
+    fetchUserData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [uid])
 
   const handleSignOut = () => {
     signOut(auth).then(() => navigation.navigate("login"));
   }
+
+
   
 
   return (
@@ -18,14 +43,15 @@ const HomeScreen = ({ navigation, route }) => {
       <View style={styles.signOutButtonContainer}>
         <Button title="Sign Out" onPress={handleSignOut} />
       </View>
-      <Text style={styles.title}>Welcome, {username}</Text>
-      <Text style={styles.subtitle}>Your Score: {score}</Text>
-      
-      <Text style={styles.link} onPress={() => navigation.navigate('match-requests', {uid, username})}>Go to Match Requests</Text>
-      <Text style={styles.link} onPress={() => navigation.navigate('rankings', {uid, data})}>Go to Rankings</Text>
-      <Text style={styles.link} onPress={() => navigation.navigate('conversations', {uid, data})}>View Conversations</Text>
+      {userData && (
+        <React.Fragment>
+          <Text style={styles.title}>Welcome, {userData.username}</Text>
+          <Text style={styles.subtitle}>Your Score: {userData.score}</Text>
+        </React.Fragment>
+      )}
     </View>
   );
+  
 };
 
 const styles = StyleSheet.create({
@@ -51,7 +77,7 @@ const styles = StyleSheet.create({
   },
   signOutButtonContainer: {
     position: 'absolute',
-    top: 20,
+    top: 100,
     right: 20,
   },
 });
