@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Alert, StyleSheet, Text, View, TextInput, Button } from 'react-native';
 import { query,orderByChild, equalTo, getDatabase, ref, get, set } from '@firebase/database';
 
+// USERNAME
 
 const OnboardingScreen = ({navigation, route}) => {
   const [username, setUsername] = useState('');
@@ -35,11 +36,10 @@ const OnboardingScreen = ({navigation, route}) => {
       if (await checkUsername(username)) {
         await Promise.all([
        set(ref(getDatabase(), `users/${uid}/username`), username),
-       set(ref(getDatabase(), `users/${uid}/onboardingComplete`), true)
       ]);
     Alert.alert('Cool name! Welcome to ISO 11');
 
-    navigation.navigate('bottom-tabs', { screen: 'Home', params: { uid: uid } })
+    navigation.navigate('onboarding-2')
     }}catch(error){
       console.log(error);
     }

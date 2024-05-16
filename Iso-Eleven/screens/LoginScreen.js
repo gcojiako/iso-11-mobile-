@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Alert, View, Text, TextInput, Button, StyleSheet, ScrollView } from 'react-native';
 import { initializeApp } from '@firebase/app';
-import { onAuthStateChanged, getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, initializeAuth, getReactNativePersistence, sendEmailVerification } from '@firebase/auth';
+import { sendPasswordResetEmail, onAuthStateChanged, getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, initializeAuth, getReactNativePersistence, sendEmailVerification } from '@firebase/auth';
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 import { getDatabase, ref, set, get } from '@firebase/database';
 import { FIREBASE_API_KEY, FIREBASE_AUTH_DOMAIN, FIREBASE_DATABASE_URL, FIREBASE_PROJECT_ID, FIREBASE_STORAGE_BUCKET, FIREBASE_MESSAGING_SENDER_ID, FIREBASE_APP_ID, FIREBASE_MEASUREMENT_ID} from "@env"
@@ -81,10 +81,10 @@ const LoginScreen = ({navigation}) => {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
 
       const user = userCredential.user;
-      if (!user.emailVerified) {
-        Alert.alert("Email not verified. Please verify your email before signing in.");
-        return;
-      }
+      // if (!user.emailVerified) {
+      //   Alert.alert("Email not verified. Please verify your email before signing in.");
+      //   return;
+      // }
       const { uid} = user;
       setUID(uid);
 
@@ -136,6 +136,10 @@ const LoginScreen = ({navigation}) => {
         onChangeText={setPassword}
         value={password}
         secureTextEntry
+      />
+      <Button
+        title="Forgot Password"
+        onPress={ ()=>navigation.navigate('forgot-password')}
       />
       <Button
         title="Sign Up"

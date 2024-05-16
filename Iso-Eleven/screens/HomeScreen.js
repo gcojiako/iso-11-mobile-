@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import { View, Text, StyleSheet, Button } from 'react-native';
+import { View, Text, StyleSheet, Button, Image } from 'react-native';
 import { getAuth, signOut } from "firebase/auth";
 import getUser from '../functions/getUser';
 
@@ -45,9 +45,14 @@ const HomeScreen = ({ navigation, route }) => {
       </View>
       {userData && (
         <React.Fragment>
+          <View>
+          <Image source={{ uri: userData.profileImage }} style={styles.userPhoto}/>
+          </View>
+          
           <Text style={styles.title}>Welcome, {userData.username}</Text>
           <Text style={styles.subtitle}>Your Score: {userData.score}</Text>
         </React.Fragment>
+        
       )}
     </View>
   );
@@ -79,6 +84,12 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 100,
     right: 20,
+  },
+  userPhoto: {
+    width: 100,
+    height: 100,
+    borderRadius: 50, // Assuming the photo is square, adjust border radius as needed
+    marginBottom: 20,
   },
 });
 
