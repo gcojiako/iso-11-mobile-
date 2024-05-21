@@ -1,12 +1,29 @@
-import { View, Text, Button, StyleSheet, AppState } from "react-native";
+import {
+  View,
+  Text,
+  Button,
+  StyleSheet,
+  AppState,
+  Modal,
+} from "react-native";
 import React, { useState, useEffect } from "react";
-import { query, orderByChild, getDatabase, ref, get, set } from "@firebase/database";
+import {
+  query,
+  orderByChild,
+  getDatabase,
+  ref,
+  get,
+  set,
+} from "@firebase/database";
 import * as Location from "expo-location";
 import getUser from "../functions/getUser";
-import { useUID } from '../functions/UIDContext';
+import { useUID } from "../functions/UIDContext";
 import { goToAppSettings } from "../functions/Notifications";
+import {Slider} from '@miblanchard/react-native-slider';
 
 const RankingScreen = ({ navigation }) => {
+  // change logic to use a default radius of 10 miles (collect every user within a 10 mile raidus, then sort them by score)
+  // modal to adjust the radius
   const { uid } = useUID();
   const [rankings, setRankings] = useState([]);
   const [rankedByScore, setRankedByScore] = useState(false);
@@ -14,6 +31,28 @@ const RankingScreen = ({ navigation }) => {
   const [userData, setUserData] = useState(null);
   const [hasLocationPermission, setHasLocationPermission] = useState(null);
   const [appState, setAppState] = useState(AppState.currentState);
+  const [sliderVisible, setSliderVisible] = useState(false);
+  const [distance, setDistance] = useState(userData?.radius || 10)
+  console.log(rankings)
+
+
+  const distanceSlider = () =>{
+    return (
+      <View style={styles.sliderContainer}>
+        <Text>up to how far do you want to view other players?</Text>
+        <Text>{distance} miles</Text>
+                <Slider
+                    value={distance}
+                    onValueChange={setDistance}
+                    maximumValue = {100}
+                    minimumValue={0}
+                    step = {0.5}
+                />
+                <Button title="close" onPress={()=>setSliderVisible(false)} />
+                
+            </View>
+    )
+  }
 
   // Always call the hooks in the same order
   useEffect(() => {
@@ -21,24 +60,27 @@ const RankingScreen = ({ navigation }) => {
       await getLocationPermission();
       await fetchUserDataAndRankings();
     };
-    
+
     initialize();
 
-    const subscription = AppState.addEventListener('change', handleAppStateChange);
+    const subscription = AppState.addEventListener(
+      "change",
+      handleAppStateChange
+    );
     return () => {
       subscription.remove();
     };
-  }, [uid, rankedByScore]);
+  }, [uid, distance]);
 
   const getLocationPermission = async () => {
     const { status } = await Location.requestForegroundPermissionsAsync();
-    setHasLocationPermission(status === 'granted');
+    setHasLocationPermission(status === "granted");
   };
 
   const handleAppStateChange = async (nextAppState) => {
-    if (nextAppState === 'active') {
+    if (nextAppState === "active") {
       const { status } = await Location.requestForegroundPermissionsAsync();
-      setHasLocationPermission(status === 'granted');
+      setHasLocationPermission(status === "granted");
     }
     setAppState(nextAppState);
   };
@@ -48,7 +90,7 @@ const RankingScreen = ({ navigation }) => {
       const data = await getUser({ uid });
       setUserData(data);
     }
-    rankedByScore ? await getRankingsByScore() : await getRankingsByDistance();
+    await getRankingsByDistance();
   };
 
   const updateUserLocation = async () => {
@@ -61,48 +103,55 @@ const RankingScreen = ({ navigation }) => {
     await set(ref(getDatabase(), `users/${uid}/location`), userLocation);
   };
 
-  const getRankingsByScore = async () => {
-    try {
-      const dbRef = ref(getDatabase(), "users");
-      const rankingsSnapshot = await get(query(dbRef, orderByChild("score")));
-      if (rankingsSnapshot.exists()) {
-        const rankingsData = rankingsSnapshot.val();
-        const rankedUsers = Object.entries(rankingsData).map(
-          ([uid, data]) => ({
-            uid,
-            username: data.username,
-            score: data.score,
-          })
-        );
-        rankedUsers.sort((a, b) => b.score - a.score);
-        setRankings(rankedUsers.filter((player) => player.uid !== uid));
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  // use radius to filter rankings returned by rankedbydistance, then rank the result by score
+
+  // const getRankingsByScore = async () => {
+  //   try {
+  //     const dbRef = ref(getDatabase(), "users");
+  //     const rankingsSnapshot = await get(query(dbRef, orderByChild("score")));
+  //     if (rankingsSnapshot.exists()) {
+  //       const rankingsData = rankingsSnapshot.val();
+  //       const rankedUsers = Object.entries(rankingsData).map(([uid, data]) => ({
+  //         uid,
+  //         username: data.username,
+  //         score: data.score,
+  //       }));
+  //       rankedUsers.sort((a, b) => b.score - a.score);
+  //       setRankings(rankedUsers.filter((player) => player.uid !== uid));
+  //     }
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
 
   const getRankingsByDistance = async () => {
     try {
       await updateUserLocation();
       const dbRef = ref(getDatabase(), "users");
-      const rankingsSnapshot = await get(query(dbRef, orderByChild("location")));
+      const rankingsSnapshot = await get(
+        query(dbRef, orderByChild("location"))
+      );
       if (rankingsSnapshot.exists()) {
         const rankingsData = rankingsSnapshot.val();
         const rankedUsers = Object.entries(rankingsData)
           .map(([uid, data]) => {
             const userLocation = data.location;
             if (userLocation && location) {
-              return {
-                uid,
-                username: data.username,
-                distance: getDistance(location, userLocation),
-              };
+              const playerDistance = getDistance(location, userLocation)
+              if(playerDistance <= distance){
+                return {
+                  uid,
+                  username: data.username,
+                  score: data.score,
+                  distance: playerDistance,
+                };
+              }
+              
             }
             return null;
           })
           .filter((user) => user !== null);
-        rankedUsers.sort((a, b) => a.distance - b.distance);
+        rankedUsers.sort((a, b) => b.score - a.score);
         setRankings(rankedUsers.filter((player) => player.uid !== uid));
       }
     } catch (error) {
@@ -117,9 +166,12 @@ const RankingScreen = ({ navigation }) => {
     const R = 6371; // Radius of the earth in kilometers
     const dLat = deg2rad(lat2 - lat1);
     const dLon = deg2rad(lon2 - lon1);
-    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
-      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(deg2rad(lat1)) *
+        Math.cos(deg2rad(lat2)) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     const distanceKm = R * c;
     const distanceMiles = distanceKm * 0.621371;
@@ -146,7 +198,7 @@ const RankingScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Rankings</Text>
-      {rankings.map((player, index) => (
+      {sliderVisible ? null: rankings.map((player, index) => (
         <View key={index} style={styles.playerContainer}>
           <Text
             onPress={() =>
@@ -160,9 +212,8 @@ const RankingScreen = ({ navigation }) => {
             style={styles.playerText}
           >
             {player.username}:{" "}
-            {rankedByScore
-              ? player.score ?? "loading"
-              : player.distance ?? "loading"}
+            {player.score +"," ?? "loading"}
+            {player.distance +" miles away" ?? "loading"}
           </Text>
           <Button
             title="Request Match"
@@ -176,12 +227,16 @@ const RankingScreen = ({ navigation }) => {
             }
           />
         </View>
+        
       ))}
-      <Button
+
+      {sliderVisible ? distanceSlider(): null}
+      {sliderVisible ? null: <Button title="toggle distance?" onPress={()=>setSliderVisible(true)}/>}
+      {/* <Button
         title={rankedByScore ? "Rank by Distance" : "Rank by Score"}
         onPress={toggleRankingOrder}
         style={styles.toggleButton}
-      />
+      /> */}
     </View>
   );
 };
@@ -212,6 +267,13 @@ const styles = StyleSheet.create({
   toggleButton: {
     marginTop: 20,
   },
+  sliderContainer: {
+    flex: 1,
+    marginLeft: 10,
+    marginRight: 10,
+    alignItems: 'stretch',
+    justifyContent: 'center',
+},
 });
 
 export default RankingScreen;

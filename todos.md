@@ -1,9 +1,5 @@
-5/16/2024
-    seperate signup page
-    auth error
-5/17/2024
+5/21/2024
     use phone number to login
-    rank score by regions: select location within set radius then rank by score. double filter. additional distance toggle
 
 6/7/2024
     match cooldown???

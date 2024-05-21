@@ -13,13 +13,17 @@ import { useUID } from './functions/UIDContext'
 import BottomTabNavigator from './BottomTabNavigator'
 import ForgotPassword from './screens/ForgotPassword'
 import OnboardingScreen2 from './onboarding/OnboardingScreen2'
+import LoginOrSignup from './screens/LoginOrSignup'
+import SignupScreen from './screens/SignupScreen'
 
 const Stack = createNativeStackNavigator()
 const StackNavigator = () => {
   const { uid } = useUID();
   return (
     <Stack.Navigator >
+      <Stack.Screen name="login-signup" component={LoginOrSignup} />
         <Stack.Screen name="login" component={LoginScreen} />
+        <Stack.Screen name="signup" component={SignupScreen} />
         <Stack.Screen name="onboarding" component={OnboardingScreen} />
         <Stack.Screen name="onboarding-2" component={OnboardingScreen2} />
         <Stack.Screen name="bottom-tabs" component={BottomTabNavigator} initialParams={{ uid: uid }} />

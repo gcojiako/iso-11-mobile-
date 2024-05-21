@@ -1,24 +1,45 @@
 import React, { useState, useEffect } from "react";
-import { ScrollView, Text, Button, Modal, View, Image, StyleSheet, TouchableOpacity, Alert } from "react-native";
-import * as ImagePicker from 'expo-image-picker';
+import {
+  ScrollView,
+  Text,
+  Button,
+  Modal,
+  View,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
+import * as ImagePicker from "expo-image-picker";
 import { getDatabase, ref, set, get } from "@firebase/database";
 import { useUID } from "../functions/UIDContext";
+import defaultUserProfileImage from '../assets/images/defaultUserProfile.png'
 
-const OnboardingScreen2 = ({ navigation}) => {
-  const { uid } = useUID()
+const resolveDefaultUserProfileImage = Image.resolveAssetSource(defaultUserProfileImage).uri
+
+const OnboardingScreen2 = ({ navigation }) => {
+  const { uid } = useUID();
   const [profileImage, setProfileImage] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     const requestPermissions = async () => {
-      const cameraPermissionResult = await ImagePicker.requestCameraPermissionsAsync();
-      if (cameraPermissionResult.status !== 'granted') {
-        Alert.alert('Permission denied', 'You need to grant camera permissions to upload photos.');
+      const cameraPermissionResult =
+        await ImagePicker.requestCameraPermissionsAsync();
+      if (cameraPermissionResult.status !== "granted") {
+        Alert.alert(
+          "Permission denied",
+          "You need to grant camera permissions to upload photos."
+        );
       }
 
-      const galleryPermissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (galleryPermissionResult.status !== 'granted') {
-        Alert.alert('Permission denied', 'You need to grant gallery permissions to upload photos.');
+      const galleryPermissionResult =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (galleryPermissionResult.status !== "granted") {
+        Alert.alert(
+          "Permission denied",
+          "You need to grant gallery permissions to upload photos."
+        );
       }
     };
 
@@ -40,8 +61,14 @@ const OnboardingScreen2 = ({ navigation}) => {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalText}>Choose an option</Text>
-            <Button title="Upload from Camera" onPress={() => uploadImage('camera')} />
-            <Button title="Upload from Gallery" onPress={() => uploadImage('gallery')} />
+            <Button
+              title="Upload from Camera"
+              onPress={() => uploadImage("camera")}
+            />
+            <Button
+              title="Upload from Gallery"
+              onPress={() => uploadImage("gallery")}
+            />
             <Button title="Close" onPress={() => setModalVisible(false)} />
           </View>
         </View>
@@ -55,7 +82,7 @@ const OnboardingScreen2 = ({ navigation}) => {
 
   const saveImage = async (image) => {
     try {
-        setProfileImage(image)
+      setProfileImage(image);
       setModalVisible(false);
     } catch (e) {
       console.log(e);
@@ -66,7 +93,7 @@ const OnboardingScreen2 = ({ navigation}) => {
     try {
       let result = {};
 
-      if (mode === 'gallery') {
+      if (mode === "gallery") {
         await ImagePicker.requestMediaLibraryPermissionsAsync();
         result = await ImagePicker.launchImageLibraryAsync({
           mediaTypes: ImagePicker.MediaTypeOptions.profileImage,
@@ -99,9 +126,17 @@ const OnboardingScreen2 = ({ navigation}) => {
 
   const next = async () => {
     try {
-      await set(ref(getDatabase(), `users/${uid}/profileImage`), profileImage);
-      set(ref(getDatabase(), `users/${uid}/onboardingComplete`), true)
-      navigation.navigate('bottom-tabs', { screen: 'Home', params: { uid: uid } })
+      if (!profileImage) {
+        await set(ref(getDatabase(), `users/${uid}/profileImage`), resolveDefaultUserProfileImage);
+      }else{
+        await set(ref(getDatabase(), `users/${uid}/profileImage`), profileImage);
+      }
+
+      await set(ref(getDatabase(), `users/${uid}/onboardingComplete`), true);
+      navigation.navigate("bottom-tabs", {
+        screen: "Home",
+        params: { uid: uid },
+      });
     } catch (e) {
       console.log(e);
     }
@@ -109,7 +144,9 @@ const OnboardingScreen2 = ({ navigation}) => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.heading}>Please choose a picture for your profile</Text>
+      <Text style={styles.heading}>
+        Please choose a picture for your profile
+      </Text>
       <Button title="Upload Image" onPress={() => setModalVisible(true)} />
       <View style={styles.imageContainer}>
         {profileImage && (
@@ -119,7 +156,14 @@ const OnboardingScreen2 = ({ navigation}) => {
         )}
       </View>
       {uploadModal()}
-      <Button title={profileImage ? "Next" : "continue without a profile picture? (you can always choose one later)"} onPress={next} />
+      <Button
+        title={
+          profileImage
+            ? "Next"
+            : "continue without a profile picture? (you can always choose one later)"
+        }
+        onPress={next}
+      />
       <Button title="go back" onPress={goBack} />
     </ScrollView>
   );
@@ -134,14 +178,14 @@ const styles = StyleSheet.create({
   },
   heading: {
     fontSize: 20,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    fontWeight: "bold",
+    textAlign: "center",
     marginBottom: 20,
   },
   imageContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
   },
   image: {
     width: 100,
@@ -150,15 +194,15 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     padding: 20,
     borderRadius: 10,
-    alignItems: 'center',
+    alignItems: "center",
   },
   modalText: {
     fontSize: 18,
