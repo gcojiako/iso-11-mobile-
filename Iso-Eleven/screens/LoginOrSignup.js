@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, Button } from 'react-native'
 import React, {useEffect} from 'react'
 import { initializeApp } from '@firebase/app';
 import {  onAuthStateChanged, initializeAuth, getReactNativePersistence } from '@firebase/auth';
-import { FIREBASE_API_KEY, FIREBASE_AUTH_DOMAIN, FIREBASE_DATABASE_URL, FIREBASE_PROJECT_ID, FIREBASE_STORAGE_BUCKET, FIREBASE_MESSAGING_SENDER_ID, FIREBASE_APP_ID, FIREBASE_MEASUREMENT_ID} from "@env"
+// import { FIREBASE_API_KEY, FIREBASE_AUTH_DOMAIN, FIREBASE_DATABASE_URL, FIREBASE_PROJECT_ID, FIREBASE_STORAGE_BUCKET, FIREBASE_MESSAGING_SENDER_ID, FIREBASE_APP_ID, FIREBASE_MEASUREMENT_ID} from "@env"
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 import { useUID } from '../functions/UIDContext';
 import { getDatabase, ref, set, get } from '@firebase/database';
@@ -39,6 +39,10 @@ const LoginOrSignup = ({navigation}) => {
       <Button
         title="Sign Up"
         onPress={()=>navigation.navigate('signup')}
+      />
+      <Button
+        title="Login with number"
+        onPress={()=>navigation.navigate('login-number')}
       />
     </View>
   )

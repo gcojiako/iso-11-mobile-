@@ -13,7 +13,7 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import { getDatabase, ref, set, get } from "@firebase/database";
 import { useUID } from "../functions/UIDContext";
-import defaultUserProfileImage from '../assets/images/defaultUserProfile.png'
+import defaultUserProfileImage from '../assets/images/defaultUserProfile.jpeg'
 
 const resolveDefaultUserProfileImage = Image.resolveAssetSource(defaultUserProfileImage).uri
 

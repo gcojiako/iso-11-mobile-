@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "1058607854478",
+    "firebase_url": "https://iso-11-default-rtdb.firebaseio.com",
+    "project_id": "iso-11",
+    "storage_bucket": "iso-11.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1058607854478:android:fb625f055dd1270691aadf",
+        "android_client_info": {
+          "package_name": "com.chisara.IsoEleven"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBqv7G1cKGK8hQKemcBxmTr0JxsLJn3HM0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
